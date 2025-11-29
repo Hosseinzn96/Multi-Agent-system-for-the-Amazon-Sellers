@@ -1,0 +1,109 @@
+# src/ui/gradio_app.py
+from dotenv import load_dotenv
+load_dotenv()
+
+
+import gradio as gr
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai import types
+
+from src.agents.customer_support.agent import customer_support_agent
+
+
+# ------------------------------------------------------------
+# Config
+# ------------------------------------------------------------
+APP_NAME = "support_app"
+USER_ID = "local_user"
+
+# One session service and one runner for the whole app
+session_service = InMemorySessionService()
+runner = Runner(
+    agent=customer_support_agent,
+    app_name=APP_NAME,
+    session_service=session_service,
+)
+
+# create the session lazily on first message
+_session_id: str | None = None
+
+
+async def get_session_id() -> str:
+    """
+    Create a session the first time, then reuse its id.
+    """
+    global _session_id
+    if _session_id is None:
+        session = await session_service.create_session(
+            app_name=APP_NAME,
+            user_id=USER_ID,
+            # optional: initial state dict
+            # state={"foo": "bar"},
+        )
+        _session_id = session.id
+    return _session_id
+
+
+# ------------------------------------------------------------
+# Async chat handler
+# ------------------------------------------------------------
+async def chat_async(message: str) -> str:
+    result_text = ""
+
+    try:
+        session_id = await get_session_id()
+
+        # Wrap user input as ADK Content
+        content = types.Content(
+            role="user",
+            parts=[types.Part(text=message)],
+        )
+
+        # Stream events from the runner
+        async for event in runner.run_async(
+            user_id=USER_ID,
+            session_id=session_id,
+            new_message=content,
+        ):
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+    except Exception as e:
+        result_text = f"Error: {e}"
+
+    if not result_text:
+        result_text = "(No response from agent.)"
+
+    return result_text
+
+
+# Gradio callback MUST be async (no asyncio.run!)
+async def chat(message, history):
+    return await chat_async(message)
+
+
+# ------------------------------------------------------------
+# Gradio UI
+# ------------------------------------------------------------
+with gr.Blocks() as demo:
+    gr.Markdown("# Product Support Bot\nChat with the customer support agent.")
+
+    gr.ChatInterface(
+        fn=chat,
+        title="Product Support Bot",
+        textbox=gr.Textbox(
+            placeholder="Ask about a product...",
+            lines=1,
+            show_label=False,
+        ),
+    )
+
+if __name__ == "__main__":
+    demo.launch(
+        share=True,
+        server_name="0.0.0.0",
+        server_port=7860,
+    )
