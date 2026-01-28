@@ -1,0 +1,39 @@
+# ---- virtual env & python cache ----
+.venv/
+__pycache__/
+*.pyc
+
+# ---- secrets ----
+.env
+
+# ---- git ----
+.git/
+.gitignore
+
+# ---- local runtime ----
+Running/
+
+# ---- local cloud state ----
+.gcloud/
+gcloud/
+
+# ---- temp / editor junk ----
+*.txt
+
+# ---- experiment artifacts ----
+*.evalset.json
+
+# ---- hash / cache artifacts ----
+0d91dad6dff4
+00fb73e37767
+03d433508697
+781dfd09e71c
+955f4ccb5624
+a4d7a9f91edb
+b01075160887
+c36c8a4eab2b
+d45b04ca6e21
+
+# ---- datasets (ONLY if required at build time) ----
+!data/
+!data/*.csv

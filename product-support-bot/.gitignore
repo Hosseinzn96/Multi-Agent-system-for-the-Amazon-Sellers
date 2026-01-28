@@ -1,4 +1,34 @@
+# ---- virtual env & secrets ----
 .venv/
 .env
+
+# ---- python ----
 __pycache__/
+*.pyc
+
+# ---- data ----
 *.csv
+
+# ---- runtime ----
+Running/
+
+# ---- cloud local state ----
+.gcloud/
+gcloud/
+
+# ---- experiments ----
+*.evalset.json
+
+# ---- temp files ----
+*.txt
+
+# ---- hash artifacts ----
+0d91dad6dff4
+00fb73e37767
+03d433508697
+781dfd09e71c
+955f4ccb5624
+a4d7a9f91edb
+b01075160887
+c36c8a4eab2b
+d45b04ca6e21
