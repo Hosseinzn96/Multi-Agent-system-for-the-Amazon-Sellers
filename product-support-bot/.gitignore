@@ -22,6 +22,20 @@ gcloud/
 # ---- temp files ----
 *.txt
 
+
+
+# runtime
+Running/
+
+# adk eval artifacts
+.adk/
+evals/
+
+# junk artifacts
+-r
+25.3
+
+
 # ---- hash artifacts ----
 0d91dad6dff4
 00fb73e37767
