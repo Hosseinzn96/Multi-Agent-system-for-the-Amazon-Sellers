@@ -33,7 +33,7 @@ ADK is used to orchestrate both the **Customer Support Agent** and the **Product
 
 ## 📊 **Dataset Layer**
 
-- Based on a real **Amazon electronics dataset (CSV)**
+- Based on a real **Amazon electronics dataset**
 
 ### Categories include (83 Categories):
 - Headphones, TVs, Audio Systems  
