@@ -19,14 +19,27 @@ The agents communicate over a **REST-based A2A interface**, implemented with **F
 
 ---
 
+## 🧩 **Framework & Agent Runtime (Google ADK)**
+
+The system is built using **Google Agent Development Kit (ADK)**, which provides the core abstractions for:
+- Defining LLM-based agents
+- Managing tools and sub-agents
+- Handling **agent-to-agent (A2A)** communication
+- Maintaining **session-state memory**
+
+ADK is used to orchestrate both the **Customer Support Agent** and the **Product Catalog Agent**, enabling controlled delegation, tool invocation, and stateful interactions.
+
+---
+
 ## 📊 **Dataset Layer**
 
 - Based on a real **Amazon electronics dataset (CSV)**
 
-### Categories include (non-exhaustive):
+### Categories include (83 Categories):
 - Headphones, TVs, Audio Systems  
 - Computers, Mobile Devices  
-- Accessories, Home Entertainment  
+- Accessories, Home Entertainment
+- etc  
 
 ---
 
@@ -64,6 +77,7 @@ No embedding models are used; matching is **deterministic and explainable**.
 ## 🧠 **Agents**
 
 ### 1️⃣ **Customer Support Agent**
+- Powered by **Google Gemini (gemini-2.5-flash-lite)** for low-latency conversational reasoning.
 
 #### **Responsibilities**
 - Natural language interaction  
@@ -83,6 +97,8 @@ The agent **never invents product data** and always delegates catalog operations
 ---
 
 ### 2️⃣ **Product Catalog Agent**
+- Uses **Google Gemini (gemini-2.5-flash-lite)** for deterministic tool-oriented responses.
+
 
 #### **Responsibilities**
 - Product discovery (categories, brands, product lists)  
@@ -135,6 +151,26 @@ This avoids hallucination and ensures **deterministic behavior**.
 
 ---
 
+## 🌐 **REST API & Server**
+
+- **FastAPI** is used to expose the catalog agent as a service  
+- **Uvicorn** runs the A2A server  
+- Stateless, **request–response architecture**
+
+---
+
+## 📊 **Observability, Evaluation & Monitoring**
+
+The system supports **observability and evaluation** using **adk web**, enabling:
+- Inspection of agent decisions and tool calls
+- Debugging multi-agent interactions
+- Monitoring request flows and failures
+- Qualitative evaluation of conversational behavior
+
+This setup allows iterative improvement of prompts, policies, and agent coordination during development and deployment.
+
+---
+
 ## 🔌 **Agent-to-Agent (A2A) Communication**
 
 - The catalog agent is exposed as an **A2A REST service**
@@ -147,11 +183,16 @@ This cleanly separates:
 
 ---
 
-## 🌐 **REST API & Server**
+## 🖥️ **User Interface (Gradio)**
 
-- **FastAPI** is used to expose the catalog agent as a service  
-- **Uvicorn** runs the A2A server  
-- Stateless, **request–response architecture**
+A lightweight **Gradio-based chat interface** is provided for interactive testing and demonstration.
+
+The UI allows users to:
+- Chat with the customer support agent
+- Trigger product discovery and comparisons
+- Observe memory-aware follow-ups in real time
+
+The Gradio UI connects to the customer-facing agent endpoint and is intended for development, demos, and qualitative evaluation.
 
 ---
 
@@ -165,7 +206,17 @@ The project is **container-ready** and structured for:
 Dockerization isolates:
 - Dataset loading  
 - A2A service  
-- Agent runtime  
+- Agent runtime
+- Containers are used for both local development and cloud deployment on **GCP Cloud Run**.
+
+---
+
+## ☁️ **Cloud Deployment (GCP)**
+
+- Deployed on **Google Cloud Platform (GCP)**
+- **Customer Support Agent** runs on **GCP Cloud Run**
+- Exposes a **public HTTP endpoint** for user interaction
+- Stateless, **request-driven architecture** suitable for scalable conversational AI workloads
 
 ---
 
@@ -181,20 +232,27 @@ Dockerization isolates:
 
 ---
 
-## ☁️ **Cloud Deployment (GCP)**
 
-- Deployed on **Google Cloud Platform (GCP)**
-- **Customer Support Agent** runs on **GCP Cloud Run**
-- Exposes a **public HTTP endpoint** for user interaction
-- Stateless, **request-driven architecture** suitable for scalable conversational AI workloads
+## 📁 **Project Structure**
+```text
+product-support-bot/
+├── src/
+│   ├── agents/          # Multi-agent system (customer support, product catalog)
+│   ├── server/          # FastAPI servers for each agent
+│   ├── ui/              # Gradio UI
+│   ├── tests/           # Test and debug scripts
+│   ├── data/            # Non-sensitive datasets
+│   └── main.py
+├── requirements.txt
+├── Dockerfile
+├── .gitignore
+└── .gcloudignore
 
----
 
 ## 🧠 **Summary of Techniques Used**
-
+- **REST-based A2A communication**
 - **Policy-driven prompt engineering**
 - **Tool-oriented agent design**
 - **State-aware prompting**
 - **Session-state memory engineering**
 - **State-driven context resolution**
-- **REST-based A2A communication**
